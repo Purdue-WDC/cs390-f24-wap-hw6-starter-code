@@ -62,7 +62,7 @@ To insert game result logs into the `gameLogs` collection:
 - Proper indentation (1 point)
 - Meaningful variable names (1 point)
 
-### Extra Features/Security (12 bonus points)
+### Extra Features (14 bonus points)
 
 #### Scalability: MongoDB Indexes (4 points)
 Background: Before we retrieve, update, or delete a document from a collection, the database must first identify where the document is collected on disk. Without any optimization, the database would need to linearly scan each document and check if its fields match some condition. While this is not much of an issue when there are tens of records, when the number of records grows to thousands, scanning that much data from disk will be noticeably slow. To solve this, databases allow us to set up "indexes" on collections. Indexes are data structures, most commonly B-Trees, that allow us to locate a record in logarithmic time (much faster than linear time) by a particular field (or set of fields).
@@ -76,14 +76,20 @@ Background: A common vulnerability of storing plaintext passwords in a database 
 
 Your Job:
 - Using the `hashPassword` function provided in `security.js`, hash the password before inserting it in the database (in signup). (2 points)
-- Using the `isPasswordCorrect` function provided in `security.js`, verify that an inputted password (in login) matches the hash stored in the database. (2 points)
+- Using the `isPasswordCorrect` function provided in `security.js`, verify that an inputted password (in login) matches the hash stored in the database. If it does not, response with a 401 Not Authorized status code and appropriate error message. (2 points)
 
 #### Security: JSON Web Tokens (JWT) (4 points)
 Background: When a user attempts to perform a protected action (such as editing their account), the web server will require a way to ensure that the user is who they say they are (authentication) and has the credentials to perform that particular action (authorization). The simplest solution is to have users store their passwords in session storage and repeatedly send their passwords to the server when requesting to make each protected action. However, if a hacker gained access to a user's computer, they would end up learning the user's password (which doesn't expire). Also, if we had implemented 2FA logins, we would have rendered them useless as only the password is required to perform protected actions. To solve these issues, upon sign-in, we generate an encrypted token only the server can decrypt containing a "user claim" and an expiration time. Because only the server can decrypt it and it expires, when the user stores it in session storage, they need not worry that a hacker who gains access to their computer can steal their password (or tamper with this token).
 
 Your Job:
-- When a user logs in or signs up, use the `attachJWT` function provided in `security.js` to generate a new JWT token and set the JWT header. When the frontend sees the HTTP response, access and store the JWT header in session storage (or just a local variable if you prefer). (2 points)
-- When a user asks to insert a log (or some other protected action), have the frontend send the JWT token via the JWT header and use `extractJWT` function provided in `security.js` to verify that the JWT is valid. (2 points)
+- When a user logs in or signs up, use the `attachJWT` function provided in `security.js` to generate a new JWT token and set the JWT header ("Authorization"). When the frontend sees the HTTP response, access and store the JWT header in sessionStorage (or just a local variable if you prefer). (2 points)
+- When a user asks to insert a log (or some other protected action), have the frontend send the JWT token via the JWT header ("Authorization") and use `extractJWT` function provided in `security.js` to verify that the JWT in the request object is valid. If it is not, respond with a 401 Not Authorized status code and an appropriate error message. (2 points)
+
+#### Security: Injection Prevention (2 points)
+Background: As discussed in class, a common method to avoid script injection is to sanitize any inputs on arrival to the server.
+
+Your Job:
+- When taking in a username for signup, ensure the username only contains alphanumeric characters. If it does not, throw a 400 Bad Request error with an appropriate error message. (2 points)
 
 ## Submission Guidelines
 
